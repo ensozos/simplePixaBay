@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">SimpleProject</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="register_prompt">Click here to register</string>
+    <string name="welcome_message">Welcome</string>
+    <string name="create_account">Create Account</string>
+    <string name="age">Age</string>
+    <string name="register">Register</string>
+    <string name="login_prompt">Already have an account? Login</string>
+    <string name="image_size_format">Size: %d bytes</string>
+    <string name="views_count">Views: %d</string>
+    <string name="likes_count">Likes: %d</string>
+    <string name="comments_count">Comments: %d</string>
+    <string name="favorites_count">Favorites: %d</string>
+    <string name="downloads_count">Downloads: %d</string>
+    <string name="views">Views</string>
+    <string name="likes">Likes</string>
+    <string name="comments">Comments</string>
+    <string name="downloads">Downloads</string>
+    <string name="type_label">Type: %s</string>
+    <string name="size_label">Size: %s</string>
 </resources>

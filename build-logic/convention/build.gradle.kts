@@ -21,7 +21,6 @@ kotlin {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.android.tools.common)
-    compileOnly(libs.compose.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.room.gradlePlugin)
@@ -37,17 +36,9 @@ tasks {
 
 gradlePlugin {
     plugins {
-        register("androidApplicationCompose") {
-            id = "simpleproject.android.application.compose"
-            implementationClass = "AndroidApplicationComposeConventionPlugin"
-        }
         register("androidApplication") {
             id = "simpleproject.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
-        }
-        register("androidLibraryCompose") {
-            id = "simpleproject.android.library.compose"
-            implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
         register("androidLibrary") {
             id = "simpleproject.android.library"

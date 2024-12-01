@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.simpleproject.android.application)
-    alias(libs.plugins.simpleproject.android.application.compose)
     alias(libs.plugins.simpleproject.android.hilt)
+    alias(libs.plugins.navigation.safeargs)
 }
 
 android {
@@ -12,7 +12,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.zosimadis.testing.PixaBayTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -27,36 +27,39 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+    }
 }
 
 dependencies {
-    implementation(projects.core.designsystem)
+    implementation(projects.core.domain)
+    implementation(projects.core.data)
 
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.compose.material3.adaptive)
-    implementation(libs.androidx.compose.material3.adaptive.layout)
-    implementation(libs.androidx.compose.material3.adaptive.navigation)
-    implementation(libs.androidx.compose.material3.windowSizeClass)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.lifecycle.runtimeCompose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.coil.kt)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.pager)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.coil)
 
     ksp(libs.hilt.compiler)
-
-    debugImplementation(libs.androidx.compose.ui.testManifest)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-
     kspTest(libs.hilt.compiler)
 
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.kotlin.test)
 
     androidTestImplementation(kotlin("test"))
+    androidTestImplementation(projects.core.testing)
+    androidTestImplementation(libs.androidx.fragment.testing)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.navigation.testing)
-    androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.hilt.android.testing)
+    debugImplementation(libs.androidx.fragment.testing.manifest)
 }
