@@ -10,9 +10,11 @@ import com.zosimadis.data.Result
 import com.zosimadis.data.mediator.PixabayRemoteMediator
 import com.zosimadis.database.PixaBayDatabase
 import com.zosimadis.database.model.ImageEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 internal class DefaultPixaBayRepository @Inject constructor(
@@ -37,7 +39,7 @@ internal class DefaultPixaBayRepository @Inject constructor(
         } catch (e: Exception) {
             emit(Result.Error(e))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun register(email: String, password: String, age: Int): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
@@ -48,11 +50,11 @@ internal class DefaultPixaBayRepository @Inject constructor(
         // Mock successful registration or error here
         // here in a production app we should save the id and session token to the local storage (data storage)
         emit(Result.Success(Unit))
-    }
+    }.flowOn(Dispatchers.IO)
 
     override fun login(email: String, password: String): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
-        
+
         // Simulate network delay
         delay(1000)
 
@@ -70,7 +72,7 @@ internal class DefaultPixaBayRepository @Inject constructor(
 
         //TODO use the token in your requests
         emit(Result.Success(Unit))
-    }
+    }.flowOn(Dispatchers.IO)
 
     private fun isSessionExpired(timestamp: Long): Boolean {
         val currentTime = System.currentTimeMillis()
@@ -91,12 +93,14 @@ internal class DefaultPixaBayRepository @Inject constructor(
         return Pager(
             config = PagingConfig(
                 pageSize = NETWORK_PAGE_SIZE,
-                enablePlaceholders = false,
+                enablePlaceholders = true,
                 initialLoadSize = NETWORK_PAGE_SIZE,
+                prefetchDistance = NETWORK_PAGE_SIZE,
+                maxSize = NETWORK_PAGE_SIZE * 3
             ),
             remoteMediator = remoteMediator,
             pagingSourceFactory = { database.imageDao().getPagingSource() },
-        ).flow
+        ).flow.flowOn(Dispatchers.IO)
     }
 
     override fun getImageById(imageId: Long): Flow<Result<ImageEntity>> = flow {
@@ -112,7 +116,7 @@ internal class DefaultPixaBayRepository @Inject constructor(
         } catch (e: Exception) {
             emit(Result.Error(e))
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     companion object {
         const val NETWORK_PAGE_SIZE = 50

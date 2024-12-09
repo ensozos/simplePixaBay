@@ -58,16 +58,27 @@ class HomeFragment : Fragment() {
 
     private fun observeImages() {
         viewLifecycleOwner.lifecycleScope.launch {
-            adapter.addLoadStateListener { loadStates ->
-                if (loadStates.source.refresh is LoadState.NotLoading &&
-                    loadStates.append.endOfPaginationReached &&
-                    adapter.itemCount < 1
-                ) {
-                    binding.recyclerView.scrollToPosition(0)
+            launch {
+                adapter.loadStateFlow.collectLatest { loadStates ->
+                    // Show loading or error states
+                    when (loadStates.refresh) {
+                        is LoadState.Loading -> {
+                        }
+                        is LoadState.Error -> {
+                        }
+                        is LoadState.NotLoading -> {
+                            if (loadStates.append.endOfPaginationReached && adapter.itemCount < 1) {
+                                binding.recyclerView.scrollToPosition(0)
+                            }
+                        }
+                    }
                 }
             }
-            viewModel.imagesFlow.collectLatest { pagingData ->
-                adapter.submitData(pagingData)
+
+            launch {
+                viewModel.imagesFlow.collectLatest { pagingData ->
+                    adapter.submitData(lifecycle, pagingData)
+                }
             }
         }
     }

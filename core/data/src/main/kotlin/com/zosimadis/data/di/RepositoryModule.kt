@@ -10,7 +10,7 @@ import dagger.hilt.components.SingletonComponent
 
 @InstallIn(SingletonComponent::class)
 @Module
-class SharedModule {
+class RepositoryModule {
 
     @Provides
     fun providesContext(application: Application): Context {
@@ -21,5 +21,7 @@ class SharedModule {
     fun providesSharedPref(context: Context): SharedPreferences {
         return context.getSharedPreferences("my_preferences", Context.MODE_PRIVATE)
     }
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.zosimadis.simpleproject.home
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -23,7 +24,12 @@ class ImageListAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        getItem(position)?.let { holder.bind(it) }
+        val item = getItem(position)
+        if (item != null) {
+            holder.bind(item)
+        } else {
+            holder.bindPlaceholder()
+        }
     }
 }
 
@@ -42,6 +48,14 @@ class ImageViewHolder(
 
             textViewUsername.text = image.user
             root.setOnClickListener { onItemClick(image) }
+        }
+    }
+
+    fun bindPlaceholder() {
+        with(binding) {
+            imageViewThumbnail.setImageResource(android.R.drawable.ic_menu_gallery)
+            textViewUsername.text = "Loading..."
+            root.setOnClickListener(null)
         }
     }
 }
