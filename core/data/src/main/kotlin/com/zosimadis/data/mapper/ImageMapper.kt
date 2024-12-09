@@ -24,6 +24,7 @@ fun NetworkImageResource.toImageEntity(): ImageEntity {
         user = user,
         imageSize = imageSize,
         userImageUrl = userImageUrl,
+        collections = collections
     )
 }
 
@@ -48,5 +49,6 @@ fun ImageEntity.toNetworkResource(): NetworkImageResource {
         user = user,
         userImageUrl = userImageUrl,
         imageSize = imageSize,
+        collections = collections,
     )
 }

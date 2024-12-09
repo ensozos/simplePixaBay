@@ -25,6 +25,7 @@ data class ImageEntity(
     val largeImageUrl: String,
     val views: Int,
     val downloads: Int,
+    val collections: Int,
     val likes: Int,
     val comments: Int,
     val userId: Int,

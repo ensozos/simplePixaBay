@@ -50,6 +50,7 @@ class DetailsViewModel @Inject constructor(
                                 userName = result.data.user,
                                 views = result.data.views,
                                 likes = result.data.likes,
+                                favorites = result.data.collections,
                                 comments = result.data.comments,
                                 downloads = result.data.downloads,
                             )

@@ -16,6 +16,7 @@ import com.zosimadis.simpleproject.databinding.FragmentDetailsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
+import java.util.*
 
 @AndroidEntryPoint
 class DetailsFragment : Fragment() {
@@ -74,7 +75,7 @@ class DetailsFragment : Fragment() {
                 placeholder(android.R.drawable.ic_menu_gallery)
             }
 
-            imageSize.text = getString(R.string.size_label, state.imageSize.toString())
+            imageSize.text = getString(R.string.size_label, formatSize(state.imageSize))
             imageType.text = getString(R.string.type_label, state.imageType)
             userName.text = state.userName
 
@@ -92,7 +93,13 @@ class DetailsFragment : Fragment() {
             likes.text = NumberFormat.getNumberInstance().format(state.likes)
             comments.text = NumberFormat.getNumberInstance().format(state.comments)
             downloads.text = NumberFormat.getNumberInstance().format(state.downloads)
+            favorites.text = NumberFormat.getNumberInstance().format(state.favorites)
         }
+    }
+
+    private fun formatSize(bytes: Long): String {
+        val mb = bytes / (1024.0 * 1024.0)
+        return String.format(Locale.US, "%.1f MB", mb)
     }
 
     private fun handleEvent(event: DetailsEvent) {

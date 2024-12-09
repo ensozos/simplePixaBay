@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zosimadis.data.Result
 import com.zosimadis.data.ValidationResult
+import com.zosimadis.domain.IsLoggedInUseCase
 import com.zosimadis.domain.LoginUseCase
 import com.zosimadis.domain.ValidationException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
+    private val isLoggedInUseCase: IsLoggedInUseCase,
     private val loginUseCase: LoginUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -54,22 +56,41 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             val currentState = _uiState.value
-            loginUseCase(currentState.email, currentState.password)
-                .collect { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            _uiState.update { it.copy(isLoading = true) }
-                        }
-                        is Result.Success -> {
-                            _uiState.update { it.copy(isLoading = false) }
-                            _events.send(LoginEvent.NavigateToHome)
-                        }
-                        is Result.Error -> {
-                            _uiState.update { it.copy(isLoading = false) }
-                            handleError(result.exception)
-                        }
+            var shouldProceedWithLogin = true
+
+            isLoggedInUseCase().collect { result ->
+                when(result) {
+                    is Result.Success -> {
+                        shouldProceedWithLogin = false
+                        _events.send(LoginEvent.NavigateToHome)
+                    }
+                    is Result.Error -> {
+
+                    }
+                    Result.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
                     }
                 }
+            }
+
+            if (shouldProceedWithLogin) {
+                loginUseCase(currentState.email, currentState.password)
+                    .collect { loginResult ->
+                        when (loginResult) {
+                            is Result.Loading -> {
+                                _uiState.update { it.copy(isLoading = true) }
+                            }
+                            is Result.Success -> {
+                                _uiState.update { it.copy(isLoading = false) }
+                                _events.send(LoginEvent.NavigateToHome)
+                            }
+                            is Result.Error -> {
+                                _uiState.update { it.copy(isLoading = false) }
+                                handleError(loginResult.exception)
+                            }
+                        }
+                    }
+            }
         }
     }
 
@@ -104,6 +125,26 @@ class LoginViewModel @Inject constructor(
                     }
                 }
                 else -> _events.send(LoginEvent.ShowError("An unexpected error occurred"))
+            }
+        }
+    }
+
+    fun checkLoginStatus() {
+        viewModelScope.launch {
+            isLoggedInUseCase().collect { result ->
+                println("checkLoginStatus: $result")
+                when(result) {
+                    is Result.Success -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                        _events.send(LoginEvent.NavigateToHome)
+                    }
+                    is Result.Error -> {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
+                    Result.Loading -> {
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+                }
             }
         }
     }

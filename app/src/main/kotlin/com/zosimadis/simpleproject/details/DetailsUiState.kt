@@ -9,6 +9,7 @@ data class DetailsUiState(
     val userName: String = "",
     val views: Int = 0,
     val likes: Int = 0,
+    val favorites: Int = 0,
     val comments: Int = 0,
     val downloads: Int = 0,
     val error: String? = null,

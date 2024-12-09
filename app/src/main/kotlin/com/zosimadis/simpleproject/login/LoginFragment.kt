@@ -39,6 +39,7 @@ class LoginFragment : Fragment() {
         setupDataBinding()
         observeEvents()
         setupNavigation()
+        viewModel.checkLoginStatus()
     }
 
     private fun setupDataBinding() {

@@ -1,5 +1,6 @@
 package com.zosimadis.data.repository
 
+import android.content.SharedPreferences
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -17,7 +18,27 @@ import javax.inject.Inject
 internal class DefaultPixaBayRepository @Inject constructor(
     private val database: PixaBayDatabase,
     private val remoteMediator: PixabayRemoteMediator,
+    private val sharedPreferences: SharedPreferences,
 ) : PixaBayRepository {
+
+    override fun isLoggedIn(): Flow<Result<Unit>> = flow {
+        emit(Result.Loading)
+        try {
+            val sessionToken = sharedPreferences.getString(KEY_SESSION_TOKEN, null)
+            val sessionTimestamp = sharedPreferences.getLong(KEY_SESSION_TIMESTAMP, 0)
+            val userEmail = sharedPreferences.getString(KEY_USER_EMAIL, null)
+
+            if (sessionToken != null && userEmail != null && !isSessionExpired(sessionTimestamp)) {
+                emit(Result.Success(Unit))
+            } else {
+                clearSession()
+                emit(Result.Error(Exception("Not logged in")))
+            }
+        } catch (e: Exception) {
+            emit(Result.Error(e))
+        }
+    }
+
     override fun register(email: String, password: String, age: Int): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
 
@@ -29,14 +50,40 @@ internal class DefaultPixaBayRepository @Inject constructor(
         emit(Result.Success(Unit))
     }
 
-    override fun login(username: String, password: String): Flow<Result<Unit>> = flow {
+    override fun login(email: String, password: String): Flow<Result<Unit>> = flow {
         emit(Result.Loading)
-
+        
+        // Simulate network delay
         delay(1000)
 
-        // Mock successful login
-        // here in a production app we should update the id and session token to the local storage (data storage)
+        // Mock successful login response
+        val mockSessionToken = "session_${System.currentTimeMillis()}"
+        val sessionTimestamp = System.currentTimeMillis()
+
+        // Save session data
+        sharedPreferences.edit()
+            .putString(KEY_SESSION_TOKEN, mockSessionToken)
+            .putLong(KEY_SESSION_TIMESTAMP, sessionTimestamp)
+            .putString(KEY_USER_EMAIL, email)
+            .apply()
+
+
+        //TODO use the token in your requests
         emit(Result.Success(Unit))
+    }
+
+    private fun isSessionExpired(timestamp: Long): Boolean {
+        val currentTime = System.currentTimeMillis()
+        val sessionAge = currentTime - timestamp
+        return sessionAge > SESSION_DURATION
+    }
+
+    private fun clearSession() {
+        sharedPreferences.edit()
+            .remove(KEY_SESSION_TOKEN)
+            .remove(KEY_SESSION_TIMESTAMP)
+            .remove(KEY_USER_EMAIL)
+            .apply()
     }
 
     @OptIn(ExperimentalPagingApi::class)
@@ -69,5 +116,9 @@ internal class DefaultPixaBayRepository @Inject constructor(
 
     companion object {
         const val NETWORK_PAGE_SIZE = 50
+        private const val KEY_SESSION_TOKEN = "session_token"
+        private const val KEY_SESSION_TIMESTAMP = "session_timestamp"
+        private const val KEY_USER_EMAIL = "user_email"
+        private const val SESSION_DURATION = 24 * 60 * 60 * 1000L
     }
 }

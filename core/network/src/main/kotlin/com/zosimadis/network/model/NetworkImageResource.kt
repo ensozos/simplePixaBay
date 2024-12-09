@@ -27,6 +27,7 @@ data class NetworkImageResource(
     val imageSize: Long,
     val views: Int,
     val downloads: Int,
+    val collections: Int,
     val likes: Int,
     val comments: Int,
     @SerialName("user_id")
